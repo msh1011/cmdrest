@@ -1,0 +1,67 @@
+openapi: 3.0.0
+info:
+  title: {{ .Title }}
+  description: {{ .Description }}
+  version: {{ .Version }}
+paths:
+{{- range $path, $methods := .Paths }}
+  {{ printf "%q" $path }}:
+  {{- range $method, $info := $methods }}
+    {{ $method }}:
+    {{- if $info.Description }}
+      description: {{ $info.Description }}
+    {{- end }}
+    {{- if $info.Summary }}
+      summary: {{ $info.Summary }}
+    {{- end }}
+    {{- if $info.Tags }}
+      tags:
+    {{- range $tag := $info.Tags }}
+        - {{ $tag }}
+    {{- end }}
+    {{- end }}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunResponse'
+    {{- if $info.Params }}
+      parameters:
+    {{- range $param := $info.Params }}
+      - name: {{ $param.Name }}
+      {{- if $param.Description }}
+        description: {{ $param.Description }}
+      {{- end }}
+        in: query
+        schema:
+          type: {{ $param.Type }}
+          default: {{ $param.Default }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+components:
+  schemas:
+    RunResponse:
+      type: object
+      properties:
+        exit_code:
+          type: integer
+          description: Exit code of the command
+        stdout:
+          type: array
+          items:
+            type: string
+            description: Stdout of the command
+        stderr:
+          type: array
+          items:
+            type: string
+            description: Stderr of the command
+        error:
+          type: string
+          description: Error message if the service encountered an error
+        cmd:
+          type: string
+          description: Command that was executed

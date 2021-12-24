@@ -1,0 +1,8 @@
+application:
+  root_path: "."
+  exec_path: "example/main.go"
+  language: go
+  watch:
+    extensions: 
+      - go
+
